@@ -655,7 +655,7 @@
   </div>
 
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwA48ROYyNxA5HK8voYga7oiLFdIkaEeIANb4iGL8uCyUiOqx33kj4dhjl92-Tppa1GjA/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwUScy7OsclYfSAaMZB8gXteC4-fH1Ll4Le-kIdsVoyvdQT60kZcY17AOXA_EPFTARW8Q/exec";
 
     let uploadedImages = [];
     let sessionId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -860,12 +860,21 @@
       input.addEventListener('input', updateProgress);
     });
 
+    // 중복 제출 방지 플래그
+    let isSubmitting = false;
+
     // 폼 제출
     document.getElementById('applicationForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
+      // 이미 제출 중이면 무시
+      if (isSubmitting) {
+        return;
+      }
+      
       // 유효성 검사
       const form = e.target;
+      const submitButton = form.querySelector('.submit-button');
       let isValid = true;
       
       form.querySelectorAll('[required]').forEach(field => {
@@ -898,6 +907,11 @@
         return;
       }
 
+      // 제출 시작
+      isSubmitting = true;
+      submitButton.disabled = true;
+      submitButton.textContent = '제출 중...';
+      
       trackEvent('form_submit_attempt');
 
       // 폼 데이터 수집
@@ -942,6 +956,11 @@
         console.error("저장 오류:", error);
         trackEvent('submission_error', { error: error.message });
         alert('저장 중 오류가 발생했습니다: ' + error.message);
+        
+        // 에러 시 버튼 복구
+        isSubmitting = false;
+        submitButton.disabled = false;
+        submitButton.textContent = '신청 완료하기 🎉';
       }
     });
   </script>
