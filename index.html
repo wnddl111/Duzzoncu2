@@ -655,21 +655,45 @@
   </div>
 
   <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwA48ROYyNxA5HK8voYga7oiLFdIkaEeIANb4iGL8uCyUiOqx33kj4dhjl92-Tppa1GjA/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwUScy7OsclYfSAaMZB8gXteC4-fH1Ll4Le-kIdsVoyvdQT60kZcY17AOXA_EPFTARW8Q/exec";
 
     let uploadedImages = [];
     let sessionId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    let currentQuestionIndex = 0; // 현재 질문 인덱스 추적
+    
+    // 질문 정보 (트래킹용)
+    const questionSteps = [
+      { id: 'name', label: '이름' },
+      { id: 'nickname', label: '별명' },
+      { id: 'gender', label: '성별' },
+      { id: 'age', label: '나이' },
+      { id: 'height', label: '키' },
+      { id: 'phone', label: '연락처' },
+      { id: 'job', label: '직업' },
+      { id: 'mbti', label: 'MBTI' },
+      { id: 'ideal_type', label: '이상형' },
+      { id: 'self_intro', label: '자기소개' },
+      { id: 'photos', label: '사진' },
+      { id: 'beverage', label: '음료선호' },
+      { id: 'allergy', label: '알러지' },
+      { id: 'video', label: '촬영동의' },
+      { id: 'privacy', label: '개인정보동의' },
+      { id: 'event_date', label: '참석날짜' }
+    ];
+    
     let trackingData = {
       sessionId: sessionId,
       startTime: new Date().toISOString(),
       events: [],
       maxScrollDepth: 0,
+      lastActiveStep: 0,
+      lastStepName: '',
       userAgent: navigator.userAgent,
       screenSize: `${window.screen.width}x${window.screen.height}`,
       viewport: `${window.innerWidth}x${window.innerHeight}`
     };
 
-    // 트래킹 함수
+    // 트래킹 이벤트 기록
     function trackEvent(eventType, data = {}) {
       const event = {
         timestamp: new Date().toISOString(),
@@ -677,12 +701,40 @@
         ...data
       };
       trackingData.events.push(event);
+      
+      // 마지막 활성 단계 업데이트
+      if (data.field) {
+        const stepIndex = questionSteps.findIndex(q => q.id === data.field);
+        if (stepIndex >= 0) {
+          trackingData.lastActiveStep = stepIndex + 1;
+          trackingData.lastStepName = questionSteps[stepIndex].label;
+        }
+      }
+      
       localStorage.setItem('trackingData_' + sessionId, JSON.stringify(trackingData));
     }
 
     function sendTrackingData() {
       try {
         trackingData.endTime = new Date().toISOString();
+        
+        // 완료율 계산 (총 16개 필수 항목)
+        const form = document.getElementById('applicationForm');
+        if (form) {
+          const totalFields = form.querySelectorAll('[required]').length;
+          let filledFields = 0;
+          
+          form.querySelectorAll('[required]').forEach(field => {
+            if (field.type === 'checkbox') {
+              if (field.checked) filledFields++;
+            } else if (field.value.trim() !== '') {
+              filledFields++;
+            }
+          });
+          
+          trackingData.completionRate = Math.round((filledFields / totalFields) * 100) + '%';
+        }
+        
         const dataToSend = JSON.stringify(trackingData);
         const blob = new Blob([dataToSend], { type: 'text/plain;charset=utf-8' });
         
@@ -748,7 +800,8 @@
     // 체크박스 변경 시 진행률 업데이트
     document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
       checkbox.addEventListener('change', function() {
-        trackEvent('checkbox_toggled', { id: this.id, checked: this.checked });
+        const fieldName = this.name === 'video' ? 'video' : 'privacy';
+        trackEvent('checkbox_toggled', { field: fieldName, id: this.id, checked: this.checked });
         updateProgress();
       });
     });
@@ -763,7 +816,7 @@
         return;
       }
 
-      trackEvent('image_upload_started', { count: files.length });
+      trackEvent('image_upload_started', { field: 'photos', count: files.length });
 
       try {
         const resizedImages = await Promise.all(
@@ -800,13 +853,13 @@
         });
 
         document.getElementById('imageUploadArea').classList.add('has-images');
-        trackEvent('image_upload_success');
+        trackEvent('image_upload_success', { field: 'photos' });
         updateProgress();
 
       } catch (err) {
         console.error(err);
         alert('이미지 처리 중 오류가 발생했습니다.');
-        trackEvent('image_upload_error');
+        trackEvent('image_upload_error', { field: 'photos' });
       }
     });
 
@@ -817,7 +870,7 @@
       document.getElementById('imagePreviewContainer').innerHTML = '';
       document.getElementById('imageUploadArea').classList.remove('has-images');
       document.getElementById('photoInput').value = '';
-      trackEvent('image_removed');
+      trackEvent('image_removed', { field: 'photos' });
       updateProgress();
     }
 
@@ -857,7 +910,20 @@
 
     // 입력 필드 변경 감지
     document.querySelectorAll('input[type="text"], textarea').forEach(input => {
-      input.addEventListener('input', updateProgress);
+      input.addEventListener('input', function() {
+        updateProgress();
+      });
+      
+      // 입력 완료 시 트래킹 (포커스 아웃)
+      input.addEventListener('blur', function() {
+        if (this.value.trim() !== '') {
+          trackEvent('field_completed', { 
+            field: this.name, 
+            hasValue: true,
+            length: this.value.length 
+          });
+        }
+      });
     });
 
     // 중복 제출 방지 플래그
