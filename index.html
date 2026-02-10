@@ -867,14 +867,15 @@
     document.getElementById('applicationForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
+      const form = e.target;
+      const submitButton = form.querySelector('.submit-button');
+      
       // 이미 제출 중이면 무시
       if (isSubmitting) {
         return;
       }
       
       // 유효성 검사
-      const form = e.target;
-      const submitButton = form.querySelector('.submit-button');
       let isValid = true;
       
       form.querySelectorAll('[required]').forEach(field => {
@@ -907,10 +908,11 @@
         return;
       }
 
-      // 제출 시작
+      // ✨ 제출 시작 - 즉시 버튼 비활성화
       isSubmitting = true;
       submitButton.disabled = true;
-      submitButton.textContent = '제출 중...';
+      submitButton.style.opacity = '0.6';
+      submitButton.innerHTML = '제출 중... ⏳';
       
       trackEvent('form_submit_attempt');
 
@@ -960,7 +962,8 @@
         // 에러 시 버튼 복구
         isSubmitting = false;
         submitButton.disabled = false;
-        submitButton.textContent = '신청 완료하기 🎉';
+        submitButton.style.opacity = '1';
+        submitButton.innerHTML = '신청 완료하기 🎉';
       }
     });
   </script>
