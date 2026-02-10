@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>두쫀쿠팅 신청</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      padding-bottom: 100px;
+    }
+
+    .header {
+      background: white;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #e0e0e0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .header h1 { 
+      font-size: 24px; 
+      font-weight: 700; 
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .header p { 
+      font-size: 14px; 
+      color: #666;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #e0e0e0;
+      margin-top: 15px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0b84ff, #00d4ff);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .welcome-section {
+      background: white;
+      border-radius: 16px;
+      padding: 30px 25px;
+      padding-bottom: 100px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .welcome-section h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .notice-content {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #555;
+    }
+
+    .notice-content strong {
+      display: block;
+      color: #333;
+      font-weight: 600;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    .notice-content ul {
+      margin-left: 20px;
+      margin-top: 8px;
+    }
+
+    .notice-content li {
+      margin-bottom: 5px;
+    }
+
+    .notice-divider {
+      width: 100%;
+      height: 1px;
+      background: #e0e0e0;
+      margin: 15px 0;
+    }
+
+    .contact-link {
+      color: #0b84ff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .form-section {
+      background: white;
+      border-radius: 16px;
+      padding: 30px 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      display: none;
+    }
+
+    .form-section.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .form-group .required {
+      color: #ff3b30;
+      margin-left: 4px;
+    }
+
+    .form-group .step-info {
+      font-size: 12px;
+      color: #999;
+      font-weight: 400;
+      margin-left: 6px;
+    }
+
+    .form-group input[type="text"],
+    .form-group textarea {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 14px;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .form-group input[type="text"]:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #0b84ff;
+      box-shadow: 0 0 0 3px rgba(11, 132, 255, 0.1);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+    }
+
+    .option-btn {
+      padding: 12px 16px;
+      border: 2px solid #ddd;
+      background: white;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .option-btn:hover {
+      border-color: #0b84ff;
+      background: #f0f8ff;
+    }
+
+    .option-btn.selected {
+      border-color: #0b84ff;
+      background: #0b84ff;
+      color: white;
+      font-weight: 600;
+    }
+
+    .image-upload-area {
+      border: 2px dashed #ddd;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .image-upload-area:hover {
+      border-color: #0b84ff;
+      background: #f0f8ff;
+    }
+
+    .image-upload-area.has-images {
+      border-style: solid;
+      border-color: #0b84ff;
+      background: #f0f8ff;
+    }
+
+    .upload-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .upload-text {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .image-preview-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .image-preview-wrapper {
+      position: relative;
+    }
+
+    .image-preview {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid #0b84ff;
+    }
+
+    .remove-image {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ff3b30;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 15px;
+      background: #f8f8f8;
+      border-radius: 10px;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .checkbox-wrapper label {
+      font-size: 13px;
+      line-height: 1.5;
+      margin: 0;
+      font-weight: 400;
+      color: #333;
+    }
+
+    .submit-button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #0b84ff, #00d4ff);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 30px;
+      box-shadow: 0 4px 16px rgba(11, 132, 255, 0.4);
+      transition: all 0.3s;
+    }
+
+    .submit-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(11, 132, 255, 0.5);
+    }
+
+    .submit-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .start-button {
+      width: calc(100% - 40px);
+      max-width: 560px;
+      padding: 16px;
+      background: linear-gradient(135deg, #0b84ff, #00d4ff);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(11, 132, 255, 0.4);
+      transition: all 0.3s;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+
+    .start-button:hover {
+      transform: translateX(-50%) translateY(-2px);
+      box-shadow: 0 6px 20px rgba(11, 132, 255, 0.5);
+    }
+
+    .error-message {
+      color: #ff3b30;
+      font-size: 13px;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .success-message {
+      background: white;
+      border-radius: 16px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .success-message h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .success-message p {
+      font-size: 15px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .success-icon {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+
+      .welcome-section,
+      .form-section {
+        padding: 25px 20px;
+      }
+
+      .header h1 {
+        font-size: 20px;
+      }
+
+      .options-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>💚 두쫀쿠팅</h1>
+    <p>참여자 모집 신청서</p>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- 공지사항 섹션 -->
+    <div class="welcome-section" id="welcomeSection">
+      <h2>[두쫀쿠팅 : 두쫀쿠 만들면서 소개팅]</h2>
+      <div class="notice-content">
+        딱딱하고 각 잡힌 소개팅 말고<br>
+        두쫀쿠팅 어때요?<br><br>
+        예쁜 카페에 함께 모여<br>
+        두쫀쿠를 같이 만들다 보면,<br>
+        어느새 마음이 열리고 서로 가까워질 거예요.
+        
+        <div class="notice-divider"></div>
+
+        <strong>💌 두쫀쿠팅은 이렇게 진행돼요</strong>
+        <strong>1부 : 두쫀쿠 만들기</strong>
+        사전 정보를 바탕으로 한 테이블 배치로<br>
+        이상형과 함께 두쫀쿠를 만듭니다.
+
+        <strong>2부 : 두쫀쿠 꾸미기 & 로테이션 타임</strong>
+        가장 마음에 드는 이성에게 선물할 두쫀쿠를 꾸밉니다.<br>
+        동시에 로테이션 타임을 가지며 여러 사람들과 대화합니다.
+        
+        <div class="notice-divider"></div>
+        
+        <strong>👩‍❤️‍💋‍👨 모집 인원수</strong>
+        총 16명 모집(남,녀 각각 8명)
+        
+        <div class="notice-divider"></div>
+        
+        <strong>📍 금액</strong>
+        49,000원<br>
+        <span style="font-size: 13px; color: #666;">(계좌는 확정된 분들에 한해 문자로 개별 안내)</span>
+        
+        <div class="notice-divider"></div>
+        
+        <strong>🥐 장소</strong>
+        <ul>
+          <li>서울시 서대문구 통일로</li>
+          <li>주차 불가</li>
+        </ul>
+        <span style="font-size: 13px; color: #666;">(자세한 주소는 확정된 분들에 한해 문자로 개별 안내)</span>
+        
+        <div class="notice-divider"></div>
+        
+        <strong>🎂 참여 조건</strong>
+        <ul>
+          <li>1994년생 ~ 2002년생</li>
+          <li>두쫀쿠를 좋아하는 분</li>
+          <li>173cm 이상(남성)</li>
+        </ul>
+
+        <div class="notice-divider"></div>
+        
+        <strong>💬 추가 문의</strong>
+        <a href="https://instagram.com/duzzonku_ting" class="contact-link" target="_blank">@duzzonku_ting</a>
+      </div>
+
+      <button class="start-button" onclick="startForm()">신청서 작성 시작하기</button>
+    </div>
+
+    <!-- 폼 섹션 -->
+    <div class="form-section" id="formSection">
+      <form id="applicationForm">
+        <!-- 기본 정보 -->
+        <div class="form-group">
+          <label>이름<span class="required">*</span><span class="step-info">(1/13)</span></label>
+          <input type="text" name="name" required placeholder="홍길동">
+          <div class="error-message">이름을 입력해주세요</div>
+        </div>
+
+        <div class="form-group">
+          <label>별명<span class="required">*</span><span class="step-info">(2/13)</span></label>
+          <input type="text" name="nickname" required placeholder="소개팅에서 사용할 별명">
+          <div class="error-message">별명을 입력해주세요</div>
+        </div>
+
+        <div class="form-group">
+          <label>성별<span class="required">*</span><span class="step-info">(3/13)</span></label>
+          <div class="options-grid">
+            <div class="option-btn" data-name="gender" data-value="남성">남성</div>
+            <div class="option-btn" data-name="gender" data-value="여성">여성</div>
+          </div>
+          <input type="hidden" name="gender" required>
+          <div class="error-message">성별을 선택해주세요</div>
+        </div>
+
+        <div class="form-group">
+          <label>나이<span class="required">*</span><span class="step-info">(4/13)</span></label>
+          <input type="text" name="age" required placeholder="예: 2000년생">
+          <div class="error-message">나이를 입력해주세요</div>
+        </div>
+
+        <div class="form-group">
+          <label>키<span class="required">*</span><span class="step-info">(5/13)</span></label>
+          <input type="text" name="height" required placeholder="예: 175cm">
+          <div class="error-message">키를 입력해주세요</div>
+        </div>
+
+        <div class="form-group">
+          <label>연락처<span class="required">*</span><span class="step-info">(6/13)</span></label>
+          <input type="text" name="phone" required placeholder="010-1234-5678">
+          <div class="error-message">연락처를 입력해주세요</div>
+        </div>
+
+        <div class="form-group">
+          <label>직업<span class="required">*</span><span class="step-info">(7/13)</span></label>
+          <input type="text" name="job" required placeholder="예: 회사원, 대학생">
+          <div class="error-message">직업을 입력해주세요</div>
+        </div>
+
+        <div class="form-group">
+          <label>MBTI<span class="required">*</span><span class="step-info">(8/13)</span></label>
+          <div class="options-grid">
+            <div class="option-btn" data-name="mbti" data-value="ISTJ">ISTJ</div>
+            <div class="option-btn" data-name="mbti" data-value="ISFJ">ISFJ</div>
+            <div class="option-btn" data-name="mbti" data-value="INFJ">INFJ</div>
+            <div class="option-btn" data-name="mbti" data-value="INTJ">INTJ</div>
+            <div class="option-btn" data-name="mbti" data-value="ISTP">ISTP</div>
+            <div class="option-btn" data-name="mbti" data-value="ISFP">ISFP</div>
+            <div class="option-btn" data-name="mbti" data-value="INFP">INFP</div>
+            <div class="option-btn" data-name="mbti" data-value="INTP">INTP</div>
+            <div class="option-btn" data-name="mbti" data-value="ESTP">ESTP</div>
+            <div class="option-btn" data-name="mbti" data-value="ESFP">ESFP</div>
+            <div class="option-btn" data-name="mbti" data-value="ENFP">ENFP</div>
+            <div class="option-btn" data-name="mbti" data-value="ENTP">ENTP</div>
+            <div class="option-btn" data-name="mbti" data-value="ESTJ">ESTJ</div>
+            <div class="option-btn" data-name="mbti" data-value="ESFJ">ESFJ</div>
+            <div class="option-btn" data-name="mbti" data-value="ENFJ">ENFJ</div>
+            <div class="option-btn" data-name="mbti" data-value="ENTJ">ENTJ</div>
+            <div class="option-btn" data-name="mbti" data-value="모름">모름</div>
+          </div>
+          <input type="hidden" name="mbti" required>
+          <div class="error-message">MBTI를 선택해주세요</div>
+        </div>
+
+        <div class="form-group">
+          <label>이상형<span class="required">*</span><span class="step-info">(9/13)</span></label>
+          <textarea name="ideal_type" required placeholder="이상형을 간단히 설명해주세요 💕"></textarea>
+          <div class="error-message">이상형을 입력해주세요</div>
+        </div>
+
+        <div class="form-group">
+          <label>자기소개<span class="step-info">(10/13) - 선택사항</span></label>
+          <textarea name="self_intro" placeholder="본인을 나타내는 한마디! 스킵하셔도 괜찮습니다 🤩"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>사진<span class="required">*</span><span class="step-info">(11/13)</span></label>
+          <p style="font-size: 13px; color: #666; margin-bottom: 12px;">
+            모두가 즐거운 소셜링을 만들기 위해 사진 두 장을 받고 있습니다.<br>
+            외모 및 신원 확인을 위한 과정이니 양해 부탁드려요!<br>
+            남녀 똑같이 확인하고 있답니다 ㅎㅎ
+          </p>
+          <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('photoInput').click()">
+            <div class="upload-icon">📷</div>
+            <div class="upload-text">사진 2장 선택하기</div>
+          </div>
+          <input type="file" id="photoInput" accept="image/*" multiple style="display:none;">
+          <div class="image-preview-container" id="imagePreviewContainer"></div>
+          <input type="hidden" name="photo1" required>
+          <input type="hidden" name="photo2" required>
+          <div class="error-message">사진 2장을 업로드해주세요</div>
+        </div>
+
+        <div class="form-group">
+          <label>음료 선호<span class="required">*</span><span class="step-info">(12/13)</span></label>
+          <p style="font-size: 13px; color: #666; margin-bottom: 12px;">
+            간단한 음료를 제공하고 있습니다 ☕
+          </p>
+          <div class="options-grid">
+            <div class="option-btn" data-name="beverage" data-value="커피">커피</div>
+            <div class="option-btn" data-name="beverage" data-value="아이스티">아이스티</div>
+          </div>
+          <input type="hidden" name="beverage" required>
+          <div class="error-message">음료를 선택해주세요</div>
+        </div>
+
+        <div class="form-group">
+          <label>견과류 알러지<span class="required">*</span><span class="step-info">(13/13)</span></label>
+          <div class="options-grid">
+            <div class="option-btn" data-name="allergy" data-value="있음">있음</div>
+            <div class="option-btn" data-name="allergy" data-value="없음">없음</div>
+          </div>
+          <input type="hidden" name="allergy" required>
+          <div class="error-message">알러지 여부를 선택해주세요</div>
+        </div>
+
+        <div class="form-group">
+          <label>촬영 동의<span class="required">*</span></label>
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="videoConsent" name="video" required>
+            <label for="videoConsent">
+              후기 콘텐츠 제작을 위해 진행에 방해되지 않는 선에서 촬영이 있을 예정입니다.
+              얼굴은 전체 모자이크 처리될 예정이며 이외의 목적에는 사용되지 않습니다.
+            </label>
+          </div>
+          <div class="error-message">촬영 동의가 필요합니다</div>
+        </div>
+
+        <div class="form-group">
+          <label>개인정보 수집 및 이용 동의<span class="required">*</span></label>
+          <div class="checkbox-wrapper">
+            <input type="checkbox" id="privacyConsent" name="privacy" required>
+            <label for="privacyConsent">
+              서비스 제공(목적)을 위해 상기 정보를 수집하며, 수집된 정보는 행사 운영 목적으로만 사용되며 행사 종료 후 자동 파기됩니다.
+            </label>
+          </div>
+          <div class="error-message">개인정보 수집 및 이용 동의가 필요합니다</div>
+        </div>
+
+        <div class="form-group">
+          <label>참석 가능한 날짜<span class="required">*</span></label>
+          <div class="options-grid" style="grid-template-columns: 1fr;">
+            <div class="option-btn" data-name="event_date" data-value="2/22 (일) 15:30~17:30">2/22 (일) 15:30~17:30</div>
+            <div class="option-btn" data-name="event_date" data-value="3/1 (일) 15:30~17:30">3/1 (일) 15:30~17:30</div>
+            <div class="option-btn" data-name="event_date" data-value="3/8 (일) 15:30~17:30">3/8 (일) 15:30~17:30</div>
+          </div>
+          <input type="hidden" name="event_date" required>
+          <div class="error-message">날짜를 선택해주세요</div>
+        </div>
+
+        <button type="submit" class="submit-button">신청 완료하기 🎉</button>
+      </form>
+    </div>
+
+    <!-- 완료 메시지 -->
+    <div class="form-section" id="successSection">
+      <div class="success-message">
+        <div class="success-icon">🎉</div>
+        <h2>신청이 완료되었습니다!</h2>
+        <p>
+          소중한 시간 내주셔서 감사합니다.<br>
+          확정 안내는 개별 문자로 드릴 예정입니다.<br><br>
+          두쫀쿠팅에서 뵙겠습니다! 💚
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwUScy7OsclYfSAaMZB8gXteC4-fH1Ll4Le-kIdsVoyvdQT60kZcY17AOXA_EPFTARW8Q/exec";
+
+    let uploadedImages = [];
+    let sessionId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    let trackingData = {
+      sessionId: sessionId,
+      startTime: new Date().toISOString(),
+      events: [],
+      maxScrollDepth: 0,
+      userAgent: navigator.userAgent,
+      screenSize: `${window.screen.width}x${window.screen.height}`,
+      viewport: `${window.innerWidth}x${window.innerHeight}`
+    };
+
+    // 트래킹 함수
+    function trackEvent(eventType, data = {}) {
+      const event = {
+        timestamp: new Date().toISOString(),
+        type: eventType,
+        ...data
+      };
+      trackingData.events.push(event);
+      localStorage.setItem('trackingData_' + sessionId, JSON.stringify(trackingData));
+    }
+
+    function sendTrackingData() {
+      try {
+        trackingData.endTime = new Date().toISOString();
+        const dataToSend = JSON.stringify(trackingData);
+        const blob = new Blob([dataToSend], { type: 'text/plain;charset=utf-8' });
+        
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(GAS_URL + '?action=tracking', blob);
+        }
+      } catch (error) {}
+    }
+
+    // 페이지 로드
+    trackEvent('page_load');
+    window.addEventListener('beforeunload', sendTrackingData);
+
+    // 폼 시작
+    function startForm() {
+      trackEvent('start_button_click');
+      document.getElementById('welcomeSection').style.display = 'none';
+      document.getElementById('formSection').classList.add('active');
+      updateProgress();
+      window.scrollTo(0, 0);
+    }
+
+    // 진행률 업데이트
+    function updateProgress() {
+      const form = document.getElementById('applicationForm');
+      const totalFields = form.querySelectorAll('[required]').length;
+      let filledFields = 0;
+
+      form.querySelectorAll('[required]').forEach(field => {
+        if (field.type === 'checkbox') {
+          if (field.checked) filledFields++;
+        } else if (field.value.trim() !== '') {
+          filledFields++;
+        }
+      });
+
+      const progress = (filledFields / totalFields) * 100;
+      document.getElementById('progressFill').style.width = progress + '%';
+    }
+
+    // 옵션 버튼 클릭
+    document.querySelectorAll('.option-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const name = this.dataset.name;
+        const value = this.dataset.value;
+        
+        // 같은 그룹의 다른 버튼 선택 해제
+        document.querySelectorAll(`.option-btn[data-name="${name}"]`).forEach(b => {
+          b.classList.remove('selected');
+        });
+        
+        // 현재 버튼 선택
+        this.classList.add('selected');
+        
+        // hidden input에 값 설정
+        document.querySelector(`input[name="${name}"]`).value = value;
+        
+        trackEvent('option_selected', { field: name, value: value });
+        updateProgress();
+      });
+    });
+
+    // 체크박스 변경 시 진행률 업데이트
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        trackEvent('checkbox_toggled', { id: this.id, checked: this.checked });
+        updateProgress();
+      });
+    });
+
+    // 이미지 업로드
+    document.getElementById('photoInput').addEventListener('change', async (e) => {
+      const files = Array.from(e.target.files);
+      
+      if (files.length !== 2) {
+        alert('사진을 정확히 2장 선택해주세요.');
+        e.target.value = '';
+        return;
+      }
+
+      trackEvent('image_upload_started', { count: files.length });
+
+      try {
+        const resizedImages = await Promise.all(
+          files.map(file => fileToResizedDataUrl(file, 0.7))
+        );
+
+        uploadedImages = resizedImages;
+        document.querySelector('input[name="photo1"]').value = resizedImages[0];
+        document.querySelector('input[name="photo2"]').value = resizedImages[1];
+
+        // 프리뷰 표시
+        const previewContainer = document.getElementById('imagePreviewContainer');
+        previewContainer.innerHTML = '';
+        
+        resizedImages.forEach((imgData, index) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'image-preview-wrapper';
+          
+          const img = document.createElement('img');
+          img.src = imgData;
+          img.className = 'image-preview';
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.className = 'remove-image';
+          removeBtn.innerHTML = '×';
+          removeBtn.onclick = (e) => {
+            e.stopPropagation();
+            removeImage(index);
+          };
+          
+          wrapper.appendChild(img);
+          wrapper.appendChild(removeBtn);
+          previewContainer.appendChild(wrapper);
+        });
+
+        document.getElementById('imageUploadArea').classList.add('has-images');
+        trackEvent('image_upload_success');
+        updateProgress();
+
+      } catch (err) {
+        console.error(err);
+        alert('이미지 처리 중 오류가 발생했습니다.');
+        trackEvent('image_upload_error');
+      }
+    });
+
+    function removeImage(index) {
+      uploadedImages = [];
+      document.querySelector('input[name="photo1"]').value = '';
+      document.querySelector('input[name="photo2"]').value = '';
+      document.getElementById('imagePreviewContainer').innerHTML = '';
+      document.getElementById('imageUploadArea').classList.remove('has-images');
+      document.getElementById('photoInput').value = '';
+      trackEvent('image_removed');
+      updateProgress();
+    }
+
+    function fileToResizedDataUrl(file, quality = 0.7) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            const maxWidth = 800;
+            const maxHeight = 800;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+              if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; }
+            } else {
+              if (height > maxHeight) { width *= maxHeight / height; height = maxHeight; }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = reject;
+          img.src = reader.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // 입력 필드 변경 감지
+    document.querySelectorAll('input[type="text"], textarea').forEach(input => {
+      input.addEventListener('input', updateProgress);
+    });
+
+    // 폼 제출
+    document.getElementById('applicationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // 유효성 검사
+      const form = e.target;
+      let isValid = true;
+      
+      form.querySelectorAll('[required]').forEach(field => {
+        const errorMsg = field.parentElement.querySelector('.error-message');
+        
+        if (field.type === 'checkbox') {
+          if (!field.checked) {
+            isValid = false;
+            if (errorMsg) errorMsg.classList.add('show');
+          } else {
+            if (errorMsg) errorMsg.classList.remove('show');
+          }
+        } else if (field.value.trim() === '') {
+          isValid = false;
+          if (errorMsg) errorMsg.classList.add('show');
+          field.style.borderColor = '#ff3b30';
+        } else {
+          if (errorMsg) errorMsg.classList.remove('show');
+          field.style.borderColor = '#ddd';
+        }
+      });
+
+      if (!isValid) {
+        alert('필수 항목을 모두 입력해주세요.');
+        // 첫 번째 에러로 스크롤
+        const firstError = form.querySelector('.error-message.show');
+        if (firstError) {
+          firstError.parentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+
+      trackEvent('form_submit_attempt');
+
+      // 폼 데이터 수집
+      const formData = new FormData(form);
+      const data = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleDateString('ko-KR'),
+        time: new Date().toLocaleTimeString('ko-KR'),
+        sessionId: sessionId
+      };
+
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(data)
+        });
+
+        let out = { ok: true };
+        try {
+          out = await res.json();
+        } catch (e) {}
+
+        if (!res.ok || out.ok === false) {
+          throw new Error(out.error || `HTTP ${res.status}`);
+        }
+
+        trackEvent('submission_success');
+        sendTrackingData();
+
+        // 성공 화면 표시
+        document.getElementById('formSection').classList.remove('active');
+        document.getElementById('successSection').classList.add('active');
+        window.scrollTo(0, 0);
+
+      } catch (error) {
+        console.error("저장 오류:", error);
+        trackEvent('submission_error', { error: error.message });
+        alert('저장 중 오류가 발생했습니다: ' + error.message);
+      }
+    });
+  </script>
+</body>
+</html>
